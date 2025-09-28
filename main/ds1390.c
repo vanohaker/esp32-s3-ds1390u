@@ -14,6 +14,10 @@ void ds1390_read_status(uint8_t *status) {
     *status = ds1390_read_from_reg(DS1390_ADDR_READ_STS);
 }
 
+void ds1390_read_control(uint8_t *control) {
+    *control = ds1390_read_from_reg(DS1390_ADDR_READ_CFG);
+}
+
 void ds1390_write_time(const ds1390_time_t *time) {
     ds1390_write_to_reg(time->hundredths, DS1390_ADDR_WRITE_HSEC);
     ds1390_write_to_reg(((time->seconds / 10) << 4) | (time->seconds % 10), DS1390_ADDR_WRITE_SEC);
@@ -27,6 +31,10 @@ void ds1390_enable_trickle_charger(void) {
 
 void ds1390_enable_oscillator(void) {
     ds1390_write_to_reg(0x00, DS1390_ADDR_WRITE_CFG);
+}
+
+void ds1390_write_rate(void) {
+    ds1390_write_to_reg(0x18, DS1390_ADDR_WRITE_CFG);
 }
 
 uint8_t ds1390_read_from_reg(uint8_t reg_addr) {

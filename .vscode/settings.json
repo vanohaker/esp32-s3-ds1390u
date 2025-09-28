@@ -28,7 +28,8 @@
         "gpio.h": "c",
         "spi_config.h": "c",
         "spi_master.h": "c",
-        "ds1390.h": "c"
+        "ds1390.h": "c",
+        "task.h": "c"
     },
     "idf.flashType": "UART"
 }

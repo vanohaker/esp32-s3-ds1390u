@@ -85,7 +85,9 @@ typedef struct {
 
 void ds1390_read_time(ds1390_time_t *time);
 void ds1390_read_status(uint8_t *status);
+void ds1390_read_control(uint8_t *control);
 void ds1390_write_time(const ds1390_time_t *time);
+void ds1390_write_rate(void);
 uint8_t ds1390_read_from_reg(uint8_t reg_addr);
 void ds1390_write_to_reg(uint8_t data, uint16_t register);
 void ds1390_enable_trickle_charger(void);

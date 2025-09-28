@@ -22,12 +22,12 @@ static void button_1_task(void *pvParameters) {
 
 static void button_2_task(void *pvParameters) {
     bool last_state = true;
-    uint8_t status;
+    uint8_t control;
     while (1) {
         bool current_state = gpio_get_level(BUTTON_2_PIN);
         if (last_state && !current_state) {
-            ds1390_read_status(&status);
-            printf("Button 2 pressed! Status: %02d\n", status);
+            ds1390_read_control(&control);
+            printf("Button 2 pressed! Status: %02d\n", control);
         }
         last_state = current_state;
         vTaskDelay(pdMS_TO_TICKS(50));
