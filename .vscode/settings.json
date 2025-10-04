@@ -29,7 +29,15 @@
         "spi_config.h": "c",
         "spi_master.h": "c",
         "ds1390.h": "c",
-        "task.h": "c"
+        "task.h": "c",
+        "array": "c",
+        "string": "c",
+        "string_view": "c",
+        "span": "c",
+        "display.h": "c",
+        "queue.h": "c",
+        "u8g2.h": "c",
+        "mui.h": "c"
     },
     "idf.flashType": "UART"
 }
