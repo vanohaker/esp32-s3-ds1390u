@@ -65,14 +65,15 @@ void button_task(void *pvParameters) {
                 if (current_pressed[index] != button_state[index]) { // Если текущее состояние кнопки не такое как состояние по умолчанию
                     button_state[index] = current_pressed[index]; // Пишем в состояние кнопок, значение текущего состояния
                     if (button_state[index]) {
-                        // Текущее состояние = кнопка нажата
+                        // Нажатие кнопки
                         button_event_t event = (button_event_t)index; // Пишем в евент номер нашей кнопки
                         xQueueSend(button_queue, &event, portMAX_DELAY);
                         ESP_LOGD(TAG, "Button %d pressed", index);
                     } else {
                         // Отпускание кнопки
+                        button_event_t event = (button_event_t)index + 4;
+                        xQueueSend(button_queue, &event, portMAX_DELAY);
                         ESP_LOGD(TAG, "Button %d released", index);
-                        // Здесь можно добавить логику для отпускания, если нужно (пока не используется)
                     }
                 }
             }

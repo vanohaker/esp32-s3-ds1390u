@@ -151,19 +151,19 @@ void display_task(void *pvParameters) {
         if (xQueueReceive(button_queue, &event, 0)) {
             ESP_LOGI(TAG, "%02X", event);
             switch (event) {
-                case BUTTON_EVENT_UP:
+                case BUTTON_EVENT_UP_PRESS:
                     mui_PrevField(&mui);
                     is_redraw = 1;
                     break;
-                case BUTTON_EVENT_DOWN:
+                case BUTTON_EVENT_DOWN_PRESS:
                     mui_NextField(&mui);
                     is_redraw = 1;
                     break;
-                case BUTTON_EVENT_SELECT:
+                case BUTTON_EVENT_SELECT_PRESS:
                     mui_SendSelect(&mui);
                     is_redraw = 1;
                     break;
-                case BUTTON_EVENT_BACK:
+                case BUTTON_EVENT_BACK_PRESS:
                     mui_GotoForm(&mui, 1, 0);  // Возврат к началу формы
                     is_redraw = 1;
                     break;

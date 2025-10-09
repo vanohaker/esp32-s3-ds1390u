@@ -6,7 +6,7 @@
 
 static const char *TAG = "MENU";
 
-uint8_t mui_hrule(mui_t *ui, uint8_t msg)
+uint8_t mui_hrline(mui_t *ui, uint8_t msg)
 {
   u8g2_t *u8g2 = mui_get_U8g2(ui);
   switch(msg)
@@ -38,71 +38,26 @@ uint8_t mui_button(mui_t *mui, uint8_t msg) {
     return 0;
 }
 
-// Callback для навигационных кнопок (визуальные прямоугольники)
-uint8_t mui_nav_button(mui_t *mui, uint8_t msg) {
-    u8g2_t *u8g2 = mui_get_U8g2(mui);
-    uint8_t x = mui_get_x(mui);
-    uint8_t y = mui_get_y(mui);
-    const char *text = mui_get_text(mui);
-
-    switch (msg) {
-        case MUIF_MSG_DRAW: {
-            // Размеры кнопки
-            uint8_t w = 28;
-            uint8_t h = 8;
-            // Отрисовка прямоугольника
-            u8g2_DrawFrame(u8g2, x, y, w, h);
-            // Центрирование текста
-            uint8_t text_width = u8g2_GetStrWidth(u8g2, text);
-            uint8_t text_x = x + (w - text_width) / 2;
-            uint8_t text_y = y + h - 1; // Базовая линия текста
-            u8g2_DrawStr(u8g2, text_x, text_y, text);
-            break;
-        }
-        case MUIF_MSG_CURSOR_ENTER:
-            // Выделение кнопки (заполненный прямоугольник)
-            u8g2_DrawBox(u8g2, mui_get_x(mui), mui_get_y(mui), 28, 8);
-            u8g2_SetDrawColor(u8g2, 0); // Инверсия цвета для текста
-            u8g2_DrawStr(u8g2, mui_get_x(mui) + (28 - u8g2_GetStrWidth(u8g2, mui_get_text(mui))) / 2, mui_get_y(mui) + 7, mui_get_text(mui));
-            u8g2_SetDrawColor(u8g2, 1); // Сброс цвета
-            break;
-        case MUIF_MSG_CURSOR_LEAVE:
-            // Отрисовка без выделения
-            u8g2_DrawFrame(u8g2, mui_get_x(mui), mui_get_y(mui), 28, 8);
-            u8g2_DrawStr(u8g2, mui_get_x(mui) + (28 - u8g2_GetStrWidth(u8g2, mui_get_text(mui))) / 2, mui_get_y(mui) + 7, mui_get_text(mui));
-            break;
-    }
-    return 0;
-}
-
 // Список полей интерфейса (Field List) - это ядро вашего меню
 muif_t menu_list[] = {
     MUIF_U8G2_FONT_STYLE(0, u8g2_font_courB08_tr),   // Стиль шрифта 0
     MUIF_U8G2_FONT_STYLE(1, u8g2_font_unifont_t_symbols), // Стиль для символов
     MUIF_U8G2_LABEL(),                               // Для меток (MUI_LABEL)
-    MUIF_RO("HR", mui_hrule),                        // Горизонтальная линия
+    MUIF_RO("HR", mui_hrline),                        // Горизонтальная линия
     MUIF_BUTTON("B1", mui_button),                   // Кнопка 1
     MUIF_BUTTON("B2", mui_button),                   // Кнопка 2
     MUIF_BUTTON("B3", mui_button),                   // Кнопка 3
-    MUIF("N1", 1, 0, mui_nav_button),                      // Навигационная кнопка "Вверх"
-    MUIF("N2", 1, 0, mui_nav_button),                      // Навигационная кнопка "Вниз"
-    MUIF("N3", 1, 0, mui_nav_button),                      // Навигационная кнопка "Назад"
-    MUIF("N4", 1, 0, mui_nav_button)                       // Навигационная кнопка "Выбор"
 };
 
 // Строки определения форм (Form Definition Strings)
 fds_t menu_data[] =
-MUI_FORM(0)                  // Форма с ID 1
+MUI_FORM(0)                  // Форма с ID 0
 MUI_STYLE(0)                 // Установка стиля шрифта 0
-MUI_LABEL(5, 8, " Menu")     // Метка " Menu" на (5,8)
+MUI_LABEL(5, 8, "Menu")     // Метка " Menu" на (5,8)
 MUI_XY("HR", 0, 10)          // Горизонтальная линия на y=10
 MUI_XYT("B1", 0, 20, "GPS")  // Кнопка B1 с текстом "Item 1" на (0,20)
 MUI_XYT("B2", 0, 30, "Lora")  // Кнопка B2 на (0,30)
 MUI_XYT("B3", 0, 40, "Settings")  // Кнопка B3 на (0,40)
-MUI_XYT("N1",  2, 56, "\xe2\x8f\xb6")  // Кнопка "Вверх" (x=2, y=56)
-MUI_XYT("N2", 34, 56, "\xe2\x8f\xb7")  // Кнопка "Вниз" (x=34, y=56)
-MUI_XYT("N3", 66, 56, "\xe2\x8f\xb4")  // Кнопка "Назад" (x=66, y=56)
-MUI_XYT("N4", 98, 56, "\xe2\x8f\xb5") // Кнопка "Выбор" (x=98, y=56)
 ;
 
 size_t menu_list_size = sizeof(menu_list) / sizeof(muif_t);
