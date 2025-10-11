@@ -10,15 +10,14 @@ static const char *TAG = "MAIN";
 void app_main(void) {
     // Инициализация модулей
     init_display();
+    if (spi == NULL) {
+        ESP_LOGE(TAG, "Display initialization failed");
+        return;
+    }
     init_buttons();
     if (button_queue == NULL) {
         ESP_LOGE(TAG, "Button initialization failed");
         return; // Прекращаем, если очередь не создана
-    }
-    init_display();
-    if (spi == NULL) {
-        ESP_LOGE(TAG, "Display initialization failed");
-        return;
     }
 
     // Создание задач

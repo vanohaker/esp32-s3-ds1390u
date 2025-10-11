@@ -6,8 +6,8 @@
 #include <freertos/queue.h>
 
 // Кнопки
-#define BUTTON_DOWN     GPIO_NUM_1   // Вних
-#define BUTTON_UP       GPIO_NUM_2   // Вверх
+#define BUTTON_UP       GPIO_NUM_1   // Вних
+#define BUTTON_DOWN     GPIO_NUM_2   // Вверх
 #define BUTTON_SELECT   GPIO_NUM_3   // Выбор
 #define BUTTON_BACK     GPIO_NUM_4   // Назад
 
