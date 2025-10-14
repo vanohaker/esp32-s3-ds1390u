@@ -14,5 +14,6 @@ extern fds_t menu_data[];
 uint8_t mui_hrule(mui_t *mui, uint8_t msg);
 uint8_t mui_button(mui_t *mui, uint8_t msg);
 uint8_t mui_nav_button(mui_t *mui, uint8_t msg);
+uint8_t mui_brightness_bar(mui_t *ui, uint8_t msg);
 
 #endif // MENU_H

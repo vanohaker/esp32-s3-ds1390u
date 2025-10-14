@@ -26,12 +26,9 @@ extern mui_t mui;
 extern spi_device_handle_t spi;
 extern volatile uint8_t is_redraw;
 
-uint8_t mui_hrule(mui_t *mui, uint8_t msg);
-uint8_t mui_button(mui_t *mui, uint8_t msg);
-uint8_t mui_nav_button(mui_t *mui, uint8_t msg);
-
 // Функции
 void init_display(void);
 void display_task(void *pvParameters);
+void set_contrast(uint8_t value);
 
 #endif // DISPLAY_H

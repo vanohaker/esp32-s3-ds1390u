@@ -19,6 +19,11 @@ mui_t mui;
 spi_device_handle_t spi;
 volatile uint8_t is_redraw = 1;
 
+void set_contrast(uint8_t value) {
+    u8g2_SetContrast(&u8g2, value);
+    ESP_LOGI(TAG, "Contrast set to %d", value);
+}
+
 // https://github.com/olikraus/u8g2/wiki/Porting-to-new-MCU-platform#communication-callback-eg-u8x8_byte_hw_i2c
 uint8_t u8x8_byte_4wire_hw_spi(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr) {
     esp_err_t ret;
@@ -140,7 +145,7 @@ void init_display(void) {
     u8g2_SetPowerSave(&u8g2, 0);
     u8g2_ClearDisplay(&u8g2);
     mui_Init(&mui, &u8g2, menu_data, menu_list, menu_list_size);
-    mui_GotoForm(&mui, 0, 0);
+    mui_GotoForm(&mui, 35, 0); // 35 это форма с настройками яркости
     ESP_LOGI(TAG, "Display init complete.");
 }
 
@@ -149,7 +154,7 @@ void display_task(void *pvParameters) {
     button_event_t event;
     while (1) {
         if (xQueueReceive(button_queue, &event, 0)) {
-            ESP_LOGI(TAG, "%02X", event);
+            // ESP_LOGI(TAG, "%02X", event);
             switch (event) {
                 case BUTTON_EVENT_UP_PRESS:
                     mui_PrevField(&mui);
