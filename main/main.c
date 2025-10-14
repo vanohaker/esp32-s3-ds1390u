@@ -9,19 +9,21 @@ static const char *TAG = "MAIN";
 
 void app_main(void) {
     // Инициализация модулей
-    init_display();
+    // init_display();
+    // if (spi == NULL) {
+    //     ESP_LOGE(TAG, "Display initialization failed");
+    //     return;
+    // }
+    epaper_display_init();
     init_buttons();
     if (button_queue == NULL) {
         ESP_LOGE(TAG, "Button initialization failed");
         return; // Прекращаем, если очередь не создана
     }
-    init_display();
-    if (spi == NULL) {
-        ESP_LOGE(TAG, "Display initialization failed");
-        return;
-    }
+    
 
     // Создание задач
     xTaskCreate(button_task, "button_task", 2048, NULL, 6, NULL);
-    xTaskCreate(display_task, "display_task", 4096, NULL, 5, NULL);
+    // xTaskCreate(display_task, "display_task", 4096, NULL, 5, NULL);
+    xTaskCreate(epaper_display_task, "epaper_display_task", 4096, NULL, 5, NULL);
 }

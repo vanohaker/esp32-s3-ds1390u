@@ -3,9 +3,6 @@
 #define DISPLAY_H
 
 #include <freertos/FreeRTOS.h>
-#include <u8g2.h>
-#include <mui.h>
-#include <mui_u8g2.h>
 #include <driver/spi_master.h>
 #include "button.h"
 
@@ -21,17 +18,14 @@
 // #define DMA_CHAN SPI_DMA_CH_AUTO
 
 // Глобальные переменные
-extern u8g2_t u8g2;
-extern mui_t mui;
 extern spi_device_handle_t spi;
 extern volatile uint8_t is_redraw;
-
-uint8_t mui_hrule(mui_t *mui, uint8_t msg);
-uint8_t mui_button(mui_t *mui, uint8_t msg);
-uint8_t mui_nav_button(mui_t *mui, uint8_t msg);
 
 // Функции
 void init_display(void);
 void display_task(void *pvParameters);
+
+void epaper_display_init(void);
+void epaper_display_task(void *pvParameters);
 
 #endif // DISPLAY_H
