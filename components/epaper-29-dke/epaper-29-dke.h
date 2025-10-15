@@ -40,8 +40,8 @@ typedef struct
 #define UNCOLORED       1
 
 // Display resolution
-#define EPD_WIDTH       128
-#define EPD_HEIGHT      296
+#define EPD_WIDTH       296
+#define EPD_HEIGHT      128
 
 // Display CONTROLLER COMMANDS
 // DEPG0290B01 commands
@@ -87,6 +87,7 @@ typedef struct {
     int width;
     int height;
     bool color_inv;
+    int dma_chan;
 } epaper_conf_t;
 
 typedef void* epaper_handle_t; /*handle of epaper*/

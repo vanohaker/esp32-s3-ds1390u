@@ -6,13 +6,6 @@
 #include <driver/spi_master.h>
 #include "button.h"
 
-// Пины для дисплея SSD1309 (SPI)
-#define PIN_MOSI GPIO_NUM_11
-#define PIN_SCLK GPIO_NUM_12
-#define PIN_CS GPIO_NUM_10
-#define PIN_DC GPIO_NUM_9
-#define PIN_RESET GPIO_NUM_8
-
 // Макросы для SPI
 // #define SPI_HOST SPI2_HOST
 // #define DMA_CHAN SPI_DMA_CH_AUTO

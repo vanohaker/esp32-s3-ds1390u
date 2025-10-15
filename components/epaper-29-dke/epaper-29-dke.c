@@ -120,6 +120,7 @@ static esp_err_t _iot_epaper_spi_send(spi_device_handle_t spi, spi_transaction_t
 
 void iot_epaper_send(spi_device_handle_t spi, const uint8_t *data, int len, epaper_dc_t *dc)
 {
+    assert(len <= 512);
     esp_err_t ret;
     if (len == 0) {
         return;    // no need to send anything
@@ -154,9 +155,14 @@ static void iot_epaper_send_data(epaper_handle_t dev, const uint8_t *data, int l
     epaper_dev_t* device = (epaper_dev_t*) dev;
     device->dc.dc_io = device->pin.dc_pin;
     device->dc.dc_level = device->pin.dc_lev_data;
-    // To Do: original driver was sending byte by byte
-    // Pay attention to possible performance issues
-    iot_epaper_send(device->bus, data, length, &device->dc);
+
+    const int MAX_CHUNK = 32; // можно уменьшить до 512 для надёжности
+    int sent = 0;
+    while (sent < length) {
+        int chunk = (length - sent > MAX_CHUNK) ? MAX_CHUNK : (length - sent);
+        iot_epaper_send(device->bus, data + sent, chunk, &device->dc);
+        sent += chunk;
+    }
     ESP_LOGI(TAG, "SPI data sent %d", length);
 }
 
@@ -209,7 +215,7 @@ static esp_err_t iot_epaper_spi_init(epaper_handle_t dev, spi_device_handle_t *e
         //Specify pre-transfer callback to handle D/C line
         .pre_cb = iot_epaper_pre_transfer_callback,
     };
-    ret = spi_bus_initialize(pin->spi_host, &buscfg, 2);
+    ret = spi_bus_initialize(pin->spi_host, &buscfg, pin->dma_chan);
     assert(ret == ESP_OK);
     ret = spi_bus_add_device(pin->spi_host, &devcfg, e_spi);
     assert(ret == ESP_OK);
@@ -263,8 +269,9 @@ static void iot_epaper_epd_init(epaper_handle_t dev)
     xSemaphoreGiveRecursive(device->spi_mux);
 }
 
-epaper_handle_t iot_epaper_create(spi_device_handle_t bus, epaper_conf_t *epconf)
+epaper_handle_t iot_epaper_create(spi_device_handle_t bus, epaper_conf_t* epconf)
 {
+    ESP_LOGI("EPAPER_DRV", "iot_epaper_create: start");
     epaper_dev_t* dev = (epaper_dev_t*) calloc(1, sizeof(epaper_dev_t));
     dev->spi_mux = xSemaphoreCreateRecursiveMutex();
     uint8_t* frame_buf = (unsigned char*) heap_caps_malloc(
@@ -278,12 +285,16 @@ epaper_handle_t iot_epaper_create(spi_device_handle_t bus, epaper_conf_t *epconf
     if (bus) {
         dev->bus = bus;
     } else {
+        ESP_LOGI("EPAPER_DRV", "before iot_epaper_spi_init");
         iot_epaper_spi_init(dev, &dev->bus, epconf);
-        ESP_LOGD(TAG, "spi init ok");
+        ESP_LOGI("EPAPER_DRV", "after iot_epaper_spi_init");
     }
     dev->pin = *epconf;
+    ESP_LOGI("EPAPER_DRV", "after pin copy");
     iot_epaper_epd_init(dev);
+    ESP_LOGI("EPAPER_DRV", "after epd_init");
     iot_epaper_paint_init(dev, frame_buf, epconf->width, epconf->height);
+    ESP_LOGI("EPAPER_DRV", "after paint_init");
     return (epaper_handle_t) dev;
 }
 
@@ -645,10 +656,10 @@ void iot_epaper_draw_filled_circle(epaper_handle_t dev, int x, int y, int radius
 
 void iot_epaper_wait_idle(epaper_handle_t dev)
 {
-    epaper_dev_t* device = (epaper_dev_t*) dev;
-    while (gpio_get_level((gpio_num_t) device->pin.busy_pin) == device->pin.busy_active_level) {
-        vTaskDelay(pdMS_TO_TICKS(10));
-    }
+    // epaper_dev_t* device = (epaper_dev_t*) dev;
+    // while (gpio_get_level((gpio_num_t) device->pin.busy_pin) == device->pin.busy_active_level) {
+        vTaskDelay(pdMS_TO_TICKS(1000));
+    // }
 }
 
 void iot_epaper_reset(epaper_handle_t dev)
