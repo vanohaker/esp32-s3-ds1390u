@@ -4,10 +4,12 @@
 #include <esp_log.h>
 #include "button.h"
 #include "display.h"
+#include "i2cscan.h"
 
 static const char *TAG = "MAIN";
 
 void app_main(void) {
+    scani2c();
     // Инициализация модулей
     init_display();
     if (spi == NULL) {

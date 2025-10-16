@@ -1,0 +1,1 @@
+void scani2c(void);

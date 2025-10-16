@@ -3,6 +3,7 @@ set(SOURCES
     button.c
     display.c
     menu.c
+    i2cscan.c
 )
 
 idf_component_register(SRCS  ${SOURCES}
