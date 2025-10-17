@@ -1,0 +1,14 @@
+choice
+    prompt "Display Interface"
+    default DISPLAY_SPI
+
+config DISPLAY_I2C
+    bool "Use I2C interface for display"
+    help
+        Enable I2C interface for the display.
+
+config DISPLAY_SPI
+    bool "Use SPI interface for display"
+    help
+        Enable SPI interface for the display.
+endchoice

@@ -7,6 +7,8 @@
   "idf.portWin": "COM7",
   "idf.toolsPathWin": "C:\\Users\\iglazkov\\.espressif",
   "files.associations": {
+    "*.yaml": "helm",
+    "*.conf": "bat",
     "freertos.h": "c",
     "esp_mac.h": "c",
     "random": "c",
@@ -41,7 +43,12 @@
     "mui_u8g2.h": "c",
     "text_encoding": "c",
     "bottons.h": "c",
-    "button.h": "c"
+    "button.h": "c",
+    "i2c.h": "c",
+    "cstdint": "c",
+    "bitset": "c",
+    "regex": "c",
+    "i2c_master.h": "c"
   },
   "idf.flashType": "UART",
   "C_Cpp.errorSquiggles": "disabled",

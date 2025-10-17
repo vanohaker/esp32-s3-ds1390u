@@ -2,7 +2,6 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <driver/gpio.h>
-#include <driver/spi_master.h>
 #include <u8g2.h>
 #include <mui.h>
 #include <mui_u8g2.h>
@@ -11,12 +10,22 @@
 #include "button.h"
 #include "menu.h"
 
+#ifdef CONFIG_DISPLAY_SPI
+#include <driver/spi_master.h>
+#endif
+
+#ifdef CONFIG_DISPLAY_I2C
+#include <driver/i2c_master.h>
+#endif
+
 static const char* TAG = "DISPLAY";
 
 // Глобальные переменные
 u8g2_t u8g2;
 mui_t mui;
 spi_device_handle_t spi;
+i2c_master_bus_handle_t bus_handle;
+i2c_master_dev_handle_t dev_handle;
 volatile uint8_t is_redraw = 1;
 
 void set_contrast(uint8_t value) {
@@ -24,6 +33,21 @@ void set_contrast(uint8_t value) {
     ESP_LOGI(TAG, "Contrast set to %d", value);
 }
 
+uint8_t u8x8_byte_4wire_hw_i2c(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr) {
+    esp_err_t ret;
+    switch (msg) {
+        case U8X8_MSG_BYTE_SEND:
+            
+        break;
+    default:
+        return 0;
+    }
+    
+    return 1;
+
+}
+
+#ifdef CONFIG_DISPLAY_SPI
 // https://github.com/olikraus/u8g2/wiki/Porting-to-new-MCU-platform#communication-callback-eg-u8x8_byte_hw_i2c
 uint8_t u8x8_byte_4wire_hw_spi(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void *arg_ptr) {
     esp_err_t ret;
@@ -56,6 +80,7 @@ uint8_t u8x8_byte_4wire_hw_spi(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, void 
     }
     return 1;
 }
+#endif
 
 // Функция для управления GPIO (DC, RST) и задержками
 // https://github.com/olikraus/u8g2/wiki/Porting-to-new-MCU-platform#the-uc-specific-gpio-and-delay-callback
@@ -63,6 +88,24 @@ uint8_t u8x8_gpio_and_delay_esp32(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, vo
     esp_err_t ret;
     switch (msg) {
         case U8X8_MSG_GPIO_AND_DELAY_INIT: // Вызывается один раз во время фазы инициализации и может использоваться для настройки пинов
+            #ifdef CONFIG_DISPLAY_I2C
+            i2c_master_bus_config_t bus_config = {
+                .i2c_port = I2C_MASTER_NUM,
+                .sda_io_num = I2C_MASTER_SDA_IO,
+                .scl_io_num = I2C_MASTER_SCL_IO,
+                .clk_source = I2C_CLK_SRC_DEFAULT,
+                .glitch_ignore_cnt = 7,
+                .flags.enable_internal_pullup = true,
+            };
+            ESP_ERROR_CHECK(i2c_new_master_bus(&bus_config, bus_handle));
+            i2c_device_config_t dev_config = {
+                .dev_addr_length = I2C_ADDR_BIT_LEN_7,
+                .device_address = SLAVE_ADDR,
+                .scl_speed_hz = I2C_MASTER_FREQ_HZ,
+             };
+            ESP_ERROR_CHECK(i2c_master_bus_add_device(*bus_handle, &dev_config, dev_handle));
+            #endif
+            #ifdef CONFIG_DISPLAY_SPI
             gpio_config_t io_conf = {
                 .pin_bit_mask = (1ULL << PIN_CS) | (1ULL << PIN_DC) | (1ULL << PIN_RESET),
                 .mode = GPIO_MODE_OUTPUT,
@@ -110,6 +153,7 @@ uint8_t u8x8_gpio_and_delay_esp32(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, vo
                 return 0;
             }
             ESP_LOGI(TAG, "GPIO, buttons and SPI initialized in INIT\n");
+            #endif
             break;
         case U8X8_MSG_DELAY_NANO: // задержка arg_int * 1 наносекунда
             esp_rom_delay_us(arg_int / 1000.0);
@@ -140,7 +184,12 @@ uint8_t u8x8_gpio_and_delay_esp32(u8x8_t *u8x8, uint8_t msg, uint8_t arg_int, vo
 
 void init_display(void) {
     // Настройка U8g2 (C API, без SetPin)
+    #ifdef CONFIG_DISPLAY_SPI
     u8g2_Setup_ssd1309_128x64_noname0_f(&u8g2, U8G2_R0, u8x8_byte_4wire_hw_spi, u8x8_gpio_and_delay_esp32);
+    #endif
+    #ifdef CONFIG_DISPLAY_I2C
+    u8g2_Setup_ssd1309_i2c_128x64_noname0_f(&u8g2, U8G2_R0, u8x8_byte_4wire_hw_i2c, u8x8_gpio_and_delay_esp32);
+    #endif
     u8g2_InitDisplay(&u8g2);
     u8g2_SetPowerSave(&u8g2, 0);
     u8g2_ClearDisplay(&u8g2);
