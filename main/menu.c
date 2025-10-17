@@ -85,7 +85,7 @@ uint8_t mui_brightness_bar(mui_t *mui, uint8_t msg) {
     uint8_t bar_height = 8;
     uint8_t filled_width = 20; // Масштабируем 1-20 в 0-100 пикселей
 
-    ESP_LOGI(TAG, "%02X", msg);
+    // ESP_LOGI(TAG, "%02X", msg);
     switch(msg) {
         case MUIF_MSG_DRAW:
             if (bright_bar_s) {
@@ -101,17 +101,11 @@ uint8_t mui_brightness_bar(mui_t *mui, uint8_t msg) {
             bright_bar_s = false;
             break;
         case MUIF_MSG_CURSOR_SELECT:
-            bright_bar_s = true;
-            break;
-        case MUIF_MSG_TOUCH_UP:
             if (bright_bar_s) {
                 bright_temp_val++;
                 set_contrast(bright_temp_val * 12.75);
+                ESP_LOGI(TAG, "bright_temp_val: %02X", bright_temp_val);
             }
-            break;
-        case MUIF_MSG_TOUCH_DOWN:
-            bright_temp_val--;
-            set_contrast(bright_temp_val * 12.75);
             break;
         default:
             break;
